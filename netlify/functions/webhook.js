@@ -4,19 +4,16 @@ export async function handler(event, context) {
   const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
   const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-  // ✅ التحقق من الربط مع فيسبوك
+  // ✅ تحقق الربط مع فيسبوك
   if (event.httpMethod === "GET") {
     const params = event.queryStringParameters;
     if (params["hub.verify_token"] === VERIFY_TOKEN) {
-      return {
-        statusCode: 200,
-        body: params["hub.challenge"],
-      };
+      return { statusCode: 200, body: params["hub.challenge"] };
     }
     return { statusCode: 403, body: "Forbidden" };
   }
 
-  // ✅ استقبال الرسائل من العملاء
+  // ✅ استقبال الرسائل
   if (event.httpMethod === "POST") {
     const body = JSON.parse(event.body);
 
@@ -25,123 +22,127 @@ export async function handler(event, context) {
         const webhookEvent = entry.messaging[0];
         const senderId = webhookEvent.sender.id;
 
+        // ✅ POSTBACK (الأزرار)
+        if (webhookEvent.postback && webhookEvent.postback.payload) {
+          const payload = webhookEvent.postback.payload;
+          if (payload === "BALANCE") {
+            await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "INTERNET") {
+            await sendMessage(senderId, "🌐 عروض موبيليس: #600*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "FLEXI") {
+            await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "CUSTOMER") {
+            await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
+          }
+          continue;
+        }
+
+        // ✅ الرسائل النصية
         if (webhookEvent.message && webhookEvent.message.text) {
           const userMsg = webhookEvent.message.text.trim().toLowerCase();
           console.log("📩 رسالة من العميل:", userMsg);
 
-          let reply = "شكراً لتواصلك مع موبليس 😊 كيف نقدر نساعدك؟";
+          let reply = "شكراً لتواصلك مع موبليس 😊 كيف نقدر نساعدك؟ اكتب 'القائمة' إذا كنت تريد الأزرار.";
 
-          // ✅ الردود الاجتماعية
-          if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
-            reply = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
-          }
-          else if (userMsg.includes("تمام") || userMsg.includes("بخير")) {
-            reply = "🙌 رائع! يسعدني سماع ذلك.";
-          }
-          else if (userMsg.includes("😂") || userMsg.includes("ههه") || userMsg.includes("lol")) {
-            reply = "🤣 هاها! ضحكتني والله.";
-          }
-          else if (userMsg.includes("🥺") || userMsg.includes("حزين")) {
-            reply = "💙 لا تزعل، إن شاء الله كل شيء يتصلح.";
-          }
-          else if (userMsg.includes("احبك") || userMsg.includes("نحبك")) {
-            reply = "❤️ وأنا نحبك بزاف! شكراً على كلامك الطيب.";
-          }
-          else if (userMsg.includes("تصبح على خير")) {
-            reply = "🌙 تصبح على خير وأحلام سعيدة.";
-          }
-          else if (userMsg.includes("صباح الخير")) {
-            reply = "☀️ صباح النور! نتمنى لك يوماً جميلاً.";
-          }
-          else if (userMsg.includes("مساء الخير")) {
-            reply = "🌆 مساء الورد والياسمين.";
+          // ✅ طلب القائمة
+          if (userMsg.includes("القائمة") || userMsg.includes("نعم")) {
+            await sendWelcomeButtons(senderId, PAGE_ACCESS_TOKEN);
+            continue;
           }
 
-          // ✅ الردود الذكية الأساسية (موبليس)
-          else if (userMsg.includes("مرحبا") || userMsg.includes("السلام")) {
-            reply = "أهلاً وسهلاً 👋 مرحبا بك في خدمة عملاء موبليس. كيف نقدر نساعدك اليوم؟";
-          } 
+          // 👥 ردود اجتماعية
+          if (userMsg.includes("كيفك") || userMsg.includes("واش راك")) reply = "😊 بخير الحمد لله، وانت؟";
+          else if (userMsg.includes("تمام") || userMsg.includes("بخير")) reply = "🙌 رائع! يسعدني سماع ذلك.";
+          else if (userMsg.includes("😂") || userMsg.includes("ههه")) reply = "🤣 هاها! ضحكتني.";
+          else if (userMsg.includes("حزين") || userMsg.includes("زعلان")) reply = "💙 ما تزعلش، ربي يفرجها.";
+          else if (userMsg.includes("احبك") || userMsg.includes("نحبك")) reply = "❤️ وأنا نحبك بزاف!";
+          else if (userMsg.includes("صباح الخير")) reply = "☀️ صباح النور! يوم سعيد.";
+          else if (userMsg.includes("مساء الخير")) reply = "🌆 مساء الورد والياسمين.";
+          else if (userMsg.includes("نكتة")) reply = "😂 نكتة: واحد راح للطبيب قالو ما نسمعش مليح.. الطبيب: واش قلت؟ 🤣";
 
-          // ✅ الذكاء: تحديد مقصد العميل
-          else if (userMsg.includes("الرصيد") || userMsg.includes("solde") || userMsg.includes("فلوس")) {
-            reply = "💰 هل تريد معرفة رصيدك الحالي 📊 أم طريقة تعبئة الرصيد 🔋؟";
+          // 📊 خدمات وأكواد موبيليس
+          else if (userMsg.includes("الرصيد") || userMsg.includes("222")) {
+            reply = "📊 لمعرفة رصيدك: #222*";
           }
-          else if (userMsg.includes("انترنت") || userMsg.includes("النت") || userMsg.includes("data")) {
-            reply = "🌐 هل تبحث عن عروض الإنترنت 📶 أم طريقة تفعيل باقة موجودة عندك؟";
+          else if (userMsg.includes("رقمي") || userMsg.includes("معرفة الرقم") || userMsg.includes("505") || userMsg.includes("101")) {
+            reply = "📱 لمعرفة رقمك: #101* أو اتصل بـ 505";
           }
-          else if (userMsg.includes("عرض") || userMsg.includes("العروض") || userMsg.includes("الباقات")) {
-            reply = "📢 هل تود معرفة العروض الخاصة بالمكالمات ☎️ أم الإنترنت 🌐 أم الباقات الشاملة؟";
+          else if (userMsg.includes("شحن") || userMsg.includes("تعبئة") || userMsg.includes("كارت")) {
+            reply = "🔋 لشحن رصيدك: *111*رقم الكارت# (يمكنك أيضاً شحن الباقات).";
           }
-          else if (userMsg.includes("فاتورة") || userMsg.includes("bill") || userMsg.includes("facture")) {
-            reply = "💳 هل ترغب في معرفة قيمة فاتورتك الحالية 📊 أم طريقة دفعها 🏦؟";
+          else if (userMsg.includes("تحويل") || userMsg.includes("فليكسي") || userMsg.includes("610")) {
+            reply = "🔄 خدمة تحويل الرصيد:\n- تسجيل: #610* واختار رقم سري.\n- رمز التسجيل: 9999.\n- شحن: *1*610*الكود*المبلغ*كلمة المرور#.\n- تحويل: *610*الرقم*المبلغ*الرقم السري#.";
           }
-          else if (userMsg.includes("مشكلة") || userMsg.includes("الشبكة") || userMsg.includes("ما يخدمش")) {
-            reply = "📡 هل المشكلة في تغطية الشبكة 📶 أم في المكالمات ☎️ أم في الإنترنت 🌐؟";
+          else if (userMsg.includes("العروض") || userMsg.includes("باقات") || userMsg.includes("600")) {
+            reply = "🌐 عروض موبيليس: #600*";
           }
-          else if (userMsg.includes("خدمة العملاء") || userMsg.includes("contact") || userMsg.includes("اتصال")) {
-            reply = "☎️ هل ترغب في التحدث مباشرة مع خدمة العملاء 👨‍💼 أم الحصول على رقم الاتصال فقط؟";
+          else if (userMsg.includes("كلمني") || userMsg.includes("606")) {
+            reply = "📩 خدمة كلمني شكراً: *606*رقم الهاتف#";
           }
-          else if (userMsg.includes("تحويل") || userMsg.includes("فليكسي") || userMsg.includes("transfert")) {
-            reply = "🔄 هل تريد معرفة طريقة تحويل الرصيد 📱 أم تفعيل الخدمة لأول مرة؟";
-          }
-          else if (userMsg.includes("بريد صوتي") || userMsg.includes("صوتي") || userMsg.includes("voicemail")) {
-            reply = "📞 هل تود تفعيل خدمة البريد الصوتي ✅ أم إلغائها ❌؟";
-          }
-
-          // ✅ القائمة السريعة
-          else if (userMsg.includes("القائمة")) {
-            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN);
-            continue; 
-          }
-          else if (userMsg.includes("شكرا") || userMsg.includes("thanks")) {
-            reply = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
-          }
-
-          // ✅ الأكواد المهمة MOBILIS CODES
-          else if (userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
-            reply = "🔋 لتعبئة رصيدك باستعمال البطاقة: اطلب *111*الأرقام 14# أو اتصل بـ 111 ثم اختر 1 وأدخل الأرقام.";
-          }
-          else if (userMsg.includes("رقمي") || userMsg.includes("معرفة الرقم")) {
-            reply = "📱 لمعرفة رقمك في موبيليس اطلب: *101#";
-          }
-          else if (userMsg.includes("مغلق") || userMsg.includes("خارج التغطية")) {
-            reply = "🚫 لتفعيل تحويل المكالمات عند انشغال الخط أو خارج التغطية: *21*#0662";
-          }
-          else if (userMsg.includes("تفعيل تحويل الرصيد")) {
-            reply = "💰 لتفعيل خدمة تحويل الرصيد اطلب: *#610";
-          }
-          else if (userMsg.includes("تحويل الرصيد") || userMsg.includes("فليكسي")) {
-            reply = "🔄 لتحويل رصيد من موبيليس لموبيليس: *610*الرقم*المبلغ*0000#";
-          }
-          else if (userMsg.includes("رسائل مجانية") || userMsg.includes("sms gratuit")) {
-            reply = "✉️ لإرسال رسالة مجانية بدون رصيد: *606*رقم المرسل إليه#";
-          }
-          else if (userMsg.includes("الرصيد") || userMsg.includes("solde")) {
-            reply = "📊 لمعرفة رصيدك اطلب: *#222";
-          }
-          else if (userMsg.includes("الرقم خاطئ") || userMsg.includes("غير موجود")) {
-            reply = "❌ لتفعيل تحويل المكالمات عند الرقم خاطئ أو غير موجود: *21*#0000";
+          else if (userMsg.includes("sms مجاني")) {
+            reply = "✉️ لإرسال SMS مجاني: *606*رقم المرسل إليه#";
           }
           else if (userMsg.includes("رونفوا") || userMsg.includes("تحويل المكالمات")) {
-            reply = "☎️ لتحويل المكالمات إلى رقم آخر: *21*الرقم المراد التحويل إليه#";
+            reply = "☎️ تحويل المكالمات: *21*الرقم المراد التحويل إليه# — إلغاء: #21#";
           }
-          else if (userMsg.includes("ماسك") || userMsg.includes("مخفي")) {
-            reply = "😎 لإخفاء رقمك (ماسك): اطلب #31# قبل الرقم.";
+          else if (userMsg.includes("المكالمات الفائتة")) {
+            reply = "📞 المكالمات الفائتة: #21*644*";
           }
           else if (userMsg.includes("انتظار المكالمات")) {
-            reply = "⏳ لتفعيل خدمة انتظار المكالمات: *21*#644";
+            reply = "⏳ لتفعيل انتظار المكالمات: *21*#644";
           }
-          else if (userMsg.includes("إلغاء رونفوا") || userMsg.includes("إلغاء تحويل")) {
-            reply = "❌ لإلغاء تحويل المكالمات (رونفوا): اطلب #21#";
+          else if (userMsg.includes("مغلق") || userMsg.includes("خارج التغطية")) {
+            reply = "🚫 مغلق/خارج التغطية: #644*21*.\n❌ إلغاء: #002* أو #21#";
           }
-          else if (userMsg.includes("رنتي") || userMsg.includes("نغمة")) {
-            reply = "🎵 لإلغاء خدمة رنتي: أرسل رسالة SMS بكلمة DES إلى الرقم 680.";
-          }
-          else if (userMsg.includes("خدمة الزبائن") || userMsg.includes("contact")) {
-            reply = "📞 خدمة الزبائن: اتصل بالرقم 666 أو 888.";
+          else if (userMsg.includes("فاتورة") || userMsg.includes("bill")) {
+            reply = "💳 لمعرفة الفاتورة: *222# أو اتصل بـ 888";
           }
 
-          // ✅ إرسال الرد النصي
+          // 🎵 خدمات إضافية
+          else if (userMsg.includes("رنتي") || userMsg.includes("نغمتي") || userMsg.includes("680")) {
+            reply = "🎵 إلغاء رنتي: #680* أو SMS بكلمة DES إلى 680.";
+          }
+          else if (userMsg.includes("mob sound")) {
+            reply = "🎶 إلغاء Mob Sound: SMS بكلمة DES إلى 4121.";
+          }
+          else if (userMsg.includes("من عندي") || userMsg.includes("men3andi")) {
+            reply = "📵 إلغاء Men3andi: #4*618*";
+          }
+          else if (userMsg.includes("mobinfo")) {
+            reply = "ℹ️ إلغاء Mobinfo: SMS بكلمة des + حرف الباقة إلى 620.";
+          }
+          else if (userMsg.includes("mobmic")) {
+            reply = "🎤 إلغاء Mobmic: #682*";
+          }
+
+          // 💡 CridiLIS (الرصيد بالدين)
+          else if (userMsg.includes("كريدي") || userMsg.includes("cridilis")) {
+            reply = "💡 خدمة CridiLIS:\n📲 اطلب *662*3*المبلغ# (20، 50 أو 100 دج).\n✅ يتم خصم المبلغ + 10 دج من التعبئة الموالية.\n👌 متاحة لمشتركي الدفع المسبق.";
+          }
+
+          // 📝 تسجيل موبليس
+          else if (userMsg.includes("تسجيل") || userMsg.includes("register")) {
+            reply = "🔳 تسجيل موبليس:\n✅ افتح تطبيق الرسائل 📱\n☑ أرسل بريد إلكتروني (email) في رسالة SMS إلى الرقم 666.\n☑ بعد 48 ساعة توصلك 2Go أو أكثر 🎉\n⚠️ التسجيل صالح مرة واحدة فقط.\n🌐 موقع التسجيل: https://www.mobilis.dz/register";
+          }
+
+          // 🌍 ردود عامة
+          else if (userMsg.includes("مساعدة") || userMsg.includes("help")) {
+            reply = "💡 يمكنك كتابة: رصيد، شحن، فليكسي، عروض، رونفوا، مغلق، فاتورة، كلمني شكراً، كريدي، تسجيل...";
+          }
+          else if (userMsg.includes("موقع")) {
+            reply = "🌐 موقع موبيليس: https://www.mobilis.dz";
+          }
+          else if (userMsg.includes("وكالة") || userMsg.includes("فرع")) {
+            reply = "📍 أقرب وكالة: https://www.mobilis.dz/coverage";
+          }
+          else {
+            reply = "⚠️ لم أفهم طلبك. جرب: رصيد، شحن، فليكسي، عروض، كريدي، تسجيل...";
+          }
+
+          // ✅ إرسال الرد
           await sendMessage(senderId, reply, PAGE_ACCESS_TOKEN);
         }
       }
@@ -153,7 +154,7 @@ export async function handler(event, context) {
   return { statusCode: 405, body: "Method Not Allowed" };
 }
 
-// 🔹 إرسال رسالة نصية عادية
+// 🔹 إرسال رسالة نصية
 async function sendMessage(senderId, text, token) {
   await fetch(`https://graph.facebook.com/v16.0/me/messages?access_token=${token}`, {
     method: "POST",
@@ -165,37 +166,27 @@ async function sendMessage(senderId, text, token) {
   });
 }
 
-// 🔹 إرسال أزرار سريعة (Quick Replies)
-async function sendQuickReplies(senderId, token) {
+// 🔹 إرسال أزرار (اختياري)
+async function sendWelcomeButtons(senderId, token) {
   await fetch(`https://graph.facebook.com/v16.0/me/messages?access_token=${token}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       recipient: { id: senderId },
       message: {
-        text: "اختر الخدمة التي تناسبك 👇:",
-        quick_replies: [
-          {
-            content_type: "text",
-            title: "📱 الرصيد",
-            payload: "BALANCE"
-          },
-          {
-            content_type: "text",
-            title: "🌐 عروض الإنترنت",
-            payload: "INTERNET"
-          },
-          {
-            content_type: "text",
-            title: "☎️ خدمة العملاء",
-            payload: "CUSTOMER_SERVICE"
-          },
-          {
-            content_type: "text",
-            title: "💳 الفاتورة",
-            payload: "BILL"
+        attachment: {
+          type: "template",
+          payload: {
+            template_type: "button",
+            text: "اختر الخدمة التي تناسبك 👇",
+            buttons: [
+              { type: "postback", title: "📱 الرصيد", payload: "BALANCE" },
+              { type: "postback", title: "🌐 العروض", payload: "INTERNET" },
+              { type: "postback", title: "🔄 فليكسي", payload: "FLEXI" },
+              { type: "postback", title: "☎️ خدمة العملاء", payload: "CUSTOMER" }
+            ]
           }
-        ]
+        }
       }
     }),
   });
