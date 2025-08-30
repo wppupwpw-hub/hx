@@ -24,32 +24,22 @@ export async function handler(event, context) {
 
         // ✅ POSTBACK (الأزرار)
         if (webhookEvent.postback && webhookEvent.postback.payload) {
-  const payload = webhookEvent.postback.payload;
+          const payload = webhookEvent.postback.payload;
 
-  if (payload === "BALANCE") {
-    await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
-  }
-  else if (payload === "INTERNET") {
-    await sendOffers(senderId, PAGE_ACCESS_TOKEN);
-  }
-  else if (payload === "FLEXI") {
-    await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
-  }
-  else if (payload === "CUSTOMER") {
-    await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
-  }
-  else if (payload === "SHOW_MENU") {
-    await sendWelcomeButtons(senderId, PAGE_ACCESS_TOKEN);
-  }
-  else if (payload === "SHOW_EXTRA") {
-    await sendExtraServices(senderId, PAGE_ACCESS_TOKEN);
-  }
-
-  // ✅ نوقف هنا وما نكملش للـ message.text
-  continue; 
-}
-
-        
+          if (payload === "BALANCE") {
+            await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "INTERNET") {
+            await sendOffers(senderId, PAGE_ACCESS_TOKEN); // عروض Twenty
+          }
+          else if (payload === "FLEXI") {
+            await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "CUSTOMER") {
+            await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
+          }
+          continue;
+        }
 
         // ✅ الرسائل النصية
         if (webhookEvent.message && webhookEvent.message.text) {
@@ -132,9 +122,7 @@ export async function handler(event, context) {
             reply = "💡 يمكنك كتابة: رصيد، شحن، فليكسي، عروض، كريدي، رونفوا، مغلق، فاتورة، كلمني...";
           }
           else {
-            // ✅ fallback مع زرارين
-            await sendFallbackOptions(senderId, PAGE_ACCESS_TOKEN);
-            continue;
+            reply = "⚠️ لم أفهم طلبك. جرب: رصيد، شحن، فليكسي، عروض، كريدي، تسجيل...";
           }
 
           // ✅ إرسال الرد
@@ -232,28 +220,4 @@ async function sendOffers(senderId, token) {
   });
   const data = await res.json();
   console.log("📤 رد فيسبوك (عروض):", data);
-}
-
-// 🔹 Fallback Options (زرارين فقط)
-async function sendFallbackOptions(senderId, token) {
-  await fetch(`https://graph.facebook.com/v16.0/me/messages?access_token=${token}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      recipient: { id: senderId },
-      message: {
-        attachment: {
-          type: "template",
-          payload: {
-            template_type: "button",
-            text: "⚠️ لم أفهم طلبك. اختر أحد الخيارات 👇",
-            buttons: [
-              { type: "postback", title: "📱 القائمة", payload: "SHOW_MENU" },
-              { type: "postback", title: "✨ خدمات إضافية", payload: "SHOW_EXTRA" }
-            ]
-          }
-        }
-      }
-    }),
-  });
 }
