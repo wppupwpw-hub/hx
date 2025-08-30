@@ -16,7 +16,7 @@ export async function handler(event, context) {
     return { statusCode: 403, body: "Forbidden" };
   }
 
-  // ✅ Handle incoming messages
+  // ✅ Handle incoming messages and postbacks
   if (event.httpMethod === "POST") {
     const body = JSON.parse(event.body);
 
@@ -37,108 +37,139 @@ export async function handler(event, context) {
           if (quickReplyPayload) {
             // Handle quick reply payloads
             switch (quickReplyPayload) {
-              case "BALANCE_MENU":
-                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
-                  { title: "📊 الرصيد الحالي", payload: "CHECK_BALANCE" },
-                  { title: "🔋 شحن الرصيد (كارت)", payload: "RECHARGE" },
-                  { title: "💰 رصيد بالدين (CridiLIS)", payload: "CRIDILIS" }
-                ]);
-                continue;
               case "CHECK_BALANCE":
                 replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: #222*";
                 break;
-              case "RECHARGE":
-                replyText = "🔋 لشحن رصيدك باستعمال الكارت: اطلب الكود #رقم الكارت*111*";
+              case "CHECK_NUMBER":
+                replyText = "📱 لمعرفة رقمك في موبيليس، اطلب الكود: #101*";
+                break;
+              case "RECHARGE_CARD":
+                replyText = "🔋 لشحن رصيدك باستعمال البطاقة: اطلب الكود #رقم الكارت*111*";
+                break;
+              case "RECHARGE_VOICE":
+                replyText = "🔋 لشحن رصيدك عبر المكالمة: اتصل على الرقم 111 ثم اختر 1 بعدها أدخل الأرقام.";
                 break;
               case "CRIDILIS":
                 replyText = "💰 لطلب رصيد بالدين (CridiLIS) بقيمة 20، 50، أو 100 دج: اطلب الكود #المبلغ*3*662*";
                 break;
+              case "HOW_TO_TRANSFER":
+                replyText = "🔄 لتحويل رصيد (فليكسي): اطلب الكود #الرقم السري*المبلغ*رقم الهاتف*610*";
+                break;
+              case "ACTIVATE_TRANSFER":
+                replyText = "🔗 لتفعيل خدمة تحويل الرصيد (فليكسي) أول مرة: اطلب الكود *#610";
+                break;
+              case "PACKAGES_AND_OFFERS":
+                replyText = "🌐 لمعرفة كل العروض والباقات اليومية، الأسبوعية، والشهرية، اطلب الكود #600*";
+                break;
+              case "CALL_ME_BACK":
+                replyText = "💬 لإرسال رسالة 'كلمني شكراً'، اطلب الكود #رقم المرسل إليه*606*";
+                break;
+              case "OUT_OF_COVERAGE":
+                replyText = "🚫 لتفعيل خدمة 'مغلق أو خارج التغطية'، اطلب الكود #0662*21*";
+                break;
+              case "OUT_OF_COVERAGE_CANCEL":
+                replyText = "❌ لإلغاء خدمة 'مغلق أو خارج التغطية'، اطلب الكود #002* أو #21#";
+                break;
+              case "WRONG_NUMBER":
+                replyText = "❌ لتفعيل خدمة 'الرقم خاطئ أو غير موجود'، اطلب الكود #0000*21*";
+                break;
+              case "CALL_FORWARDING":
+                replyText = "➡️ لتحويل المكالمات إلى رقم آخر، اطلب الكود #الرقم المراد التحويل إليه*21*";
+                break;
+              case "CALL_FORWARDING_CANCEL":
+                replyText = "❌ لإلغاء خدمة تحويل المكالمات، اطلب الكود #21#";
+                break;
+              case "MISSED_CALLS":
+                replyText = "☎️ لتفعيل خدمة المكالمات الفائتة، اطلب الكود #644*21*";
+                break;
+              case "MASK_NUMBER":
+                replyText = "😎 لإخفاء رقمك (ماسك)، اطلب الكود #31# قبل الرقم المراد الاتصال به.";
+                break;
+              case "CALL_WAITING":
+                replyText = "⏳ لتفعيل خدمة انتظار المكالمات، اطلب الكود #644*21*";
+                break;
+              case "CANCEL_RANATI":
+                replyText = "🎵 لإلغاء خدمة 'رنتي'، أرسل كلمة DES عبر رسالة SMS إلى الرقم 680.";
+                break;
+              case "CUSTOMER_SERVICE_NUMBER":
+                replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
+                break;
+              case "MOBILIS_REGISTER":
+                replyText = "📝 للتسجيل في موبيليس والحصول على 2Go أو أكثر: أرسل رسالة SMS ببريدك الإلكتروني إلى الرقم 666. ستحصل على الباقة بعد 48 ساعة. يمكنك أيضاً زيارة الرابط: https://www.mobilis.dz/register";
+                break;
+              case "BALANCE_MENU":
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
+                  { title: "📊 الرصيد الحالي", payload: "CHECK_BALANCE" },
+                  { title: "📱 معرفة الرقم", payload: "CHECK_NUMBER" },
+                  { title: "🔋 شحن الرصيد", payload: "RECHARGE_MENU" },
+                  { title: "💰 رصيد بالدين", payload: "CRIDILIS" }
+                ]);
+                continue;
+              case "RECHARGE_MENU":
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر طريقة شحن الرصيد:", [
+                  { title: "💳 باستعمال البطاقة", payload: "RECHARGE_CARD" },
+                  { title: "📞 بالاتصال", payload: "RECHARGE_VOICE" }
+                ]);
+                continue;
               case "TRANSFER_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن تحويل الرصيد (فليكسي)؟", [
                   { title: "🔄 طريقة التحويل", payload: "HOW_TO_TRANSFER" },
                   { title: "🔗 تفعيل الخدمة", payload: "ACTIVATE_TRANSFER" }
                 ]);
                 continue;
-              case "HOW_TO_TRANSFER":
-                replyText = "🔄 لتحويل رصيد (فليكسي): اطلب #الرقم السري*المبلغ*رقم الهاتف*610*";
-                break;
-              case "ACTIVATE_TRANSFER":
-                replyText = "🔗 لتفعيل خدمة تحويل الرصيد (فليكسي) أول مرة: اطلب الكود *#610";
-                break;
               case "PACKAGES_MENU":
-                replyText = "🌐 لمعرفة كل العروض والباقات، اطلب الكود #600*";
-                break;
-              case "CONTACT_MENU":
-                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "كيف يمكنني مساعدتك؟", [
-                  { title: "📞 رقم خدمة العملاء", payload: "CUSTOMER_SERVICE_NUMBER" },
-                  { title: "💬 كلمني شكراً", payload: "CALL_ME_BACK" }
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر ما يناسبك:", [
+                  { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" },
                 ]);
                 continue;
-              case "CUSTOMER_SERVICE_NUMBER":
-                replyText = "📞 يمكنك التواصل مع خدمة العملاء بالاتصال على الرقم 505 أو 666.";
-                break;
-              case "CALL_ME_BACK":
-                replyText = "💬 لإرسال رسالة 'كلمني شكراً'، اطلب الكود #رقم الهاتف*606*";
-                break;
               case "ADDITIONAL_SERVICES_MENU":
-                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الخدمات الإضافية؟", [
-                  { title: "☎️ المكالمات الفائتة", payload: "MISSED_CALLS" },
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر من الخدمات الإضافية:", [
+                  { title: "💬 كلمني شكراً", payload: "CALL_ME_BACK" },
                   { title: "🚫 مغلق / خارج التغطية", payload: "OUT_OF_COVERAGE" },
-                  { title: "➡️ تحويل المكالمات (رونفوا)", payload: "CALL_FORWARDING" }
+                  { title: "❌ إلغاء خدمات", payload: "CANCEL_SERVICES_MENU" }
                 ]);
                 continue;
-              case "MISSED_CALLS":
-                replyText = "☎️ لتفعيل خدمة المكالمات الفائتة، اطلب الكود #644*21*";
-                break;
-              case "OUT_OF_COVERAGE":
-                replyText = "🚫 لتفعيل خدمة مغلق أو خارج التغطية، اطلب الكود #644*21*";
-                break;
-              case "CALL_FORWARDING":
-                replyText = "➡️ لتحويل المكالمات إلى رقم آخر، اطلب الكود #الرقم*21*";
-                break;
+              case "CANCEL_SERVICES_MENU":
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تريد إلغاءها:", [
+                  { title: "➡️ تحويل المكالمات", payload: "CALL_FORWARDING_CANCEL" },
+                  { title: "🚫 مغلق", payload: "OUT_OF_COVERAGE_CANCEL" },
+                  { title: "🎵 رنتي", payload: "CANCEL_RANATI" }
+                ]);
+                continue;
               default:
                 replyText = "أهلاً بك! كيف يمكنني مساعدتك؟";
             }
-          }
-          else {
+          } else {
             // Handle regular text messages
             if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
               replyText = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
-            }
-            else if (userMsg.includes("القائمة") || userMsg.includes("خدمات")) {
+            } else if (userMsg.includes("القائمة") || userMsg.includes("خدمات")) {
               await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
-                { title: "💰 الرصيد", payload: "BALANCE_MENU" },
-                { title: "🔄 تحويل الرصيد", payload: "TRANSFER_MENU" },
+                { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
+                { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
                 { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
                 { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
               ]);
               continue;
-            }
-            else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
+            } else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
               replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: #222*";
-            }
-            else if (userMsg.includes("شحن الرصيد") || userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
+            } else if (userMsg.includes("شحن الرصيد") || userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
               replyText = "🔋 لشحن رصيدك باستعمال الكارت: اطلب الكود #رقم الكارت*111*";
-            }
-            else if (userMsg.includes("تحويل الرصيد") || userMsg.includes("فليكسي") || userMsg.includes("transfert")) {
+            } else if (userMsg.includes("تحويل الرصيد") || userMsg.includes("فليكسي") || userMsg.includes("transfert")) {
               replyText = "🔄 لتحويل رصيد (فليكسي): اطلب #الرقم السري*المبلغ*رقم الهاتف*610*";
-            }
-            else if (userMsg.includes("الباقات") || userMsg.includes("العروض")) {
+            } else if (userMsg.includes("الباقات") || userMsg.includes("العروض")) {
               replyText = "🌐 لمعرفة كل العروض والباقات، اطلب الكود #600*";
-            }
-            else if (userMsg.includes("كلمني شكراً") || userMsg.includes("call me back")) {
+            } else if (userMsg.includes("كلمني شكراً") || userMsg.includes("call me back")) {
               replyText = "💬 لإرسال رسالة 'كلمني شكراً'، اطلب الكود #رقم الهاتف*606*";
-            }
-            else if (userMsg.includes("تحويل المكالمات") || userMsg.includes("رونفوا")) {
+            } else if (userMsg.includes("تحويل المكالمات") || userMsg.includes("رونفوا")) {
               replyText = "➡️ لتحويل المكالمات إلى رقم آخر، اطلب الكود #الرقم*21*";
-            }
-            else if (userMsg.includes("معرفة الرقم")) {
+            } else if (userMsg.includes("معرفة الرقم")) {
               replyText = "📱 لمعرفة رقمك، اطلب الكود #101*";
-            }
-            else if (userMsg.includes("شكراً")) {
+            } else if (userMsg.includes("شكراً")) {
                 replyText = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
-            }
-            else {
+            } else if (userMsg.includes("خدمة الزبائن")) {
+              replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
+            } else {
               replyText = "أهلاً بك في خدمة عملاء موبليس 👋، كيف يمكنني مساعدتك؟";
             }
           }
