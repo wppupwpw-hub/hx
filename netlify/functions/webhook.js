@@ -140,11 +140,7 @@ export async function handler(event, context) {
               default:
                 replyText = "أهلاً بك! كيف يمكنني مساعدتك؟";
             }
-          } else {
-            // Handle regular text messages
-            if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
-              replyText = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
-            } else if (userMsg.includes("القائمة") || userMsg.includes("خدمات")) {
+          } else if (webhookEvent.postback && (webhookEvent.postback.payload === "GET_STARTED_PAYLOAD" || webhookEvent.postback.payload === "MAIN_MENU_PAYLOAD")) {
               await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
                 { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
                 { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
@@ -152,7 +148,33 @@ export async function handler(event, context) {
                 { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
               ]);
               continue;
-            } else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
+          } else {
+            // ✅ الردود الاجتماعية والإنسانية
+            if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
+              replyText = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
+            } else if (userMsg.includes("صباح الخير")) {
+              replyText = "☀️ صباح النور! أتمنى لك يوماً جميلاً ومباركاً.";
+            } else if (userMsg.includes("مساء الخير")) {
+              replyText = "🌆 مساء الورد والياسمين.";
+            } else if (userMsg.includes("تصبح على خير")) {
+              replyText = "🌙 تصبح على خير وأحلام سعيدة.";
+            } else if (userMsg.includes("تمام") || userMsg.includes("بخير") || userMsg.includes("الحمد لله")) {
+              replyText = "🙌 رائع! يسعدني سماع ذلك.";
+            } else if (userMsg.includes("شكراً") || userMsg.includes("عفواً") || userMsg.includes("thanks")) {
+              replyText = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
+            } else if (userMsg.includes("أحبك") || userMsg.includes("نحبك")) {
+              replyText = "❤️ وأنا نحبك بزاف! شكراً على كلامك الطيب.";
+            } else if (userMsg.includes("😂") || userMsg.includes("ههه") || userMsg.includes("lol")) {
+              replyText = "🤣 هاها! ضحكتني والله.";
+            } else if (userMsg.includes("🥺") || userMsg.includes("حزين") || userMsg.includes("زعلان")) {
+              replyText = "💙 لا تزعل، إن شاء الله كل شيء يتصلح.";
+            } else if (userMsg.includes("غبي") || userMsg.includes("لا تفهم")) {
+              replyText = "😔 أنا مجرد روبوت أحاول المساعدة. سأحاول أن أفهمك بشكل أفضل في المرة القادمة.";
+            } else if (userMsg.includes("من انت") || userMsg.includes("من تكون")) {
+              replyText = "أنا روبوت موبيليس، مهمتي هي مساعدتك في كل ما يخص خدمات الشركة. 😊";
+            }
+            // ✅ الردود الخاصة بالخدمات
+            else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
               replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: #222*";
             } else if (userMsg.includes("شحن الرصيد") || userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
               replyText = "🔋 لشحن رصيدك باستعمال الكارت: اطلب الكود #رقم الكارت*111*";
@@ -166,12 +188,10 @@ export async function handler(event, context) {
               replyText = "➡️ لتحويل المكالمات إلى رقم آخر، اطلب الكود #الرقم*21*";
             } else if (userMsg.includes("معرفة الرقم")) {
               replyText = "📱 لمعرفة رقمك، اطلب الكود #101*";
-            } else if (userMsg.includes("شكراً")) {
-                replyText = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
             } else if (userMsg.includes("خدمة الزبائن")) {
               replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
             } else {
-              replyText = "أهلاً بك في خدمة عملاء موبليس 👋، كيف يمكنني مساعدتك؟";
+              replyText = "أهلاً بك في خدمة عملاء موبيليس 👋، كيف يمكنني مساعدتك؟";
             }
           }
 
@@ -179,7 +199,7 @@ export async function handler(event, context) {
             await sendMessage(senderId, replyText, PAGE_ACCESS_TOKEN);
           }
         } else if (webhookEvent.postback && webhookEvent.postback.payload === "GET_STARTED_PAYLOAD") {
-            const welcomeText = "أهلاً بك في روبوت موبليس! 👋 كيف يمكنني مساعدتك اليوم؟";
+            const welcomeText = "أهلاً بك في روبوت موبيليس! 👋 كيف يمكنني مساعدتك اليوم؟";
             await sendMessage(senderId, welcomeText, PAGE_ACCESS_TOKEN);
         }
       }
