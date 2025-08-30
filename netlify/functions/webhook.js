@@ -120,6 +120,7 @@ export async function handler(event, context) {
               case "PACKAGES_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر ما يناسبك:", [
                   { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" },
+                  { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" }
                 ]);
                 continue;
               case "ADDITIONAL_SERVICES_MENU":
