@@ -137,15 +137,20 @@ export async function handler(event, context) {
           // 🌍 ردود عامة
             else if (userMsg.includes("رونفوا") || userMsg.includes("تحويل المكالمات")) {
             reply = "☎️ لتحويل المكالمات: *21*الرقم#\n❌ إلغاء: #21#";
-          } else if (userMsg.includes("مغلق") || userMsg.includes("خارج التغطية")) {
+          }
+            else if (userMsg.includes("مغلق") || userMsg.includes("خارج التغطية")) {
             reply = "🚫 لتفعيل خدمة مغلق: #644*21* \n❌ إلغاء: #002* أو #21#";
-          } else if (userMsg.includes("فاتتني") || userMsg.includes("مكالمات فائتة")) {
+          }
+            else if (userMsg.includes("فاتتني") || userMsg.includes("مكالمات فائتة")) {
             reply = "📞 المكالمات الفائتة: #21*644*";
-          } else if (userMsg.includes("خدمات اضافية") || userMsg.includes("رنتي") || userMsg.includes("mob sound") || userMsg.includes("men3andi") || userMsg.includes("mobinfo") || userMsg.includes("mobmic")) {
+          }
+            else if (userMsg.includes("خدمات اضافية") || userMsg.includes("رنتي") || userMsg.includes("mob sound") || userMsg.includes("men3andi") || userMsg.includes("mobinfo") || userMsg.includes("mobmic")) {
             reply = "🎵 خدمات إضافية:\n- إلغاء رنتي: #680*\n- إلغاء Mob Sound: SMS بكلمة DES إلى 4121\n- إلغاء Men3andi: #4*618*\n- إلغاء Mobinfo: SMS بكلمة DES + حرف الباقة إلى 620\n- إلغاء Mobmic: #682*";
-          } else if (userMsg.includes("كريدي") || userMsg.includes("cridilis") || userMsg.includes("662")) {
+          }
+            else if (userMsg.includes("كريدي") || userMsg.includes("cridilis") || userMsg.includes("662")) {
             reply = "💡 CridiLIS: اطلب *662*3*المبلغ# (20، 50 أو 100 دج).\n⚠️ تضاف 10 دج رسوم عند التعبئة.";
-          } else if (userMsg.includes("تسجيل") || userMsg.includes("register")) {
+          }
+            else if (userMsg.includes("تسجيل") || userMsg.includes("register")) {
             reply = "📝 تسجيل موبيليس:\n- أرسل بريد إلكتروني (email) في SMS إلى 666.\n- بعد 48 ساعة تتحصل على 2Go أو أكثر 🎉\n🌐 رابط: https://www.mobilis.dz/register";
             }
           else if (userMsg.includes("مساعدة") || userMsg.includes("help")) {
@@ -203,12 +208,12 @@ async function sendWelcomeButtons(senderId, token) {
               { type: "postback", title: "🌐 العروض", payload: "INTERNET" },
               { type: "postback", title: "🔄 فليكسي", payload: "FLEXI" },
               { type: "postback", title: "☎️ خدمة العملاء", payload: "CUSTOMER" } 
-          { content_type: "text", title: "☎️ رونفوا", payload: "RONVOI" },
-          { content_type: "text", title: "🚫 مغلق", payload: "OFFLINE" },
-          { content_type: "text", title: "📞 فائتة", payload: "MISSED" },
-          { content_type: "text", title: "🎵 رنتي", payload: "EXTRA" },
-          { content_type: "text", title: "💡 كريدي", payload: "CREDILIS" },
-          { content_type: "text", title: "📝 تسجيل", payload: "REGISTER" }
+              { content_type: "text", title: "☎️ رونفوا", payload: "RONVOI" },
+              { content_type: "text", title: "🚫 مغلق", payload: "OFFLINE" },
+              { content_type: "text", title: "📞 فائتة", payload: "MISSED" },
+              { content_type: "text", title: "🎵 رنتي", payload: "EXTRA" },
+              { content_type: "text", title: "💡 كريدي", payload: "CREDILIS" },
+              { content_type: "text", title: "📝 تسجيل", payload: "REGISTER" }
             ]
           }
         }
