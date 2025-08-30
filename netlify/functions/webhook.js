@@ -62,35 +62,44 @@ export async function handler(event, context) {
             reply = "أهلاً وسهلاً 👋 مرحبا بك في خدمة عملاء موبليس. كيف نقدر نساعدك اليوم؟";
           } 
 
-          // ✅ الذكاء: تحديد مقصد العميل
+          // ✅ الذكاء: تحديد مقصد العميل وإرسال ردود سريعة
           else if (userMsg.includes("الرصيد") || userMsg.includes("solde") || userMsg.includes("فلوس")) {
-            reply = "💰 هل تريد معرفة رصيدك الحالي 📊 أم طريقة تعبئة الرصيد 🔋؟";
+            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
+              { title: "📊 الرصيد الحالي", payload: "CHECK_BALANCE_PAYLOAD" },
+              { title: "🔋 شحن الرصيد", payload: "RECHARGE_PAYLOAD" },
+              { title: "💰 رصيد بالدين (CridiLIS)", payload: "CRIDILIS_PAYLOAD" }
+            ]);
+            continue;
           }
-          else if (userMsg.includes("انترنت") || userMsg.includes("النت") || userMsg.includes("data")) {
-            reply = "🌐 هل تبحث عن عروض الإنترنت 📶 أم طريقة تفعيل باقة موجودة عندك؟";
-          }
-          else if (userMsg.includes("عرض") || userMsg.includes("العروض") || userMsg.includes("الباقات")) {
-            reply = "📢 هل تود معرفة العروض الخاصة بالمكالمات ☎️ أم الإنترنت 🌐 أم الباقات الشاملة؟";
-          }
-          else if (userMsg.includes("فاتورة") || userMsg.includes("bill") || userMsg.includes("facture")) {
-            reply = "💳 هل ترغب في معرفة قيمة فاتورتك الحالية 📊 أم طريقة دفعها 🏦؟";
-          }
-          else if (userMsg.includes("مشكلة") || userMsg.includes("الشبكة") || userMsg.includes("ما يخدمش")) {
-            reply = "📡 هل المشكلة في تغطية الشبكة 📶 أم في المكالمات ☎️ أم في الإنترنت 🌐؟";
-          }
-          else if (userMsg.includes("خدمة العملاء") || userMsg.includes("contact") || userMsg.includes("اتصال")) {
-            reply = "☎️ هل ترغب في التحدث مباشرة مع خدمة العملاء 👨‍💼 أم الحصول على رقم الاتصال فقط؟";
+          else if (userMsg.includes("انترنت") || userMsg.includes("النت") || userMsg.includes("data") || userMsg.includes("الباقات") || userMsg.includes("العروض")) {
+            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الباقات والعروض؟", [
+              { title: "🌐 باقات الإنترنت", payload: "INTERNET_PACKAGES_PAYLOAD" },
+              { title: "☎️ باقات المكالمات", payload: "CALL_PACKAGES_PAYLOAD" },
+              { title: "📢 كل العروض", payload: "ALL_OFFERS_PAYLOAD" }
+            ]);
+            continue;
           }
           else if (userMsg.includes("تحويل") || userMsg.includes("فليكسي") || userMsg.includes("transfert")) {
-            reply = "🔄 هل تريد معرفة طريقة تحويل الرصيد 📱 أم تفعيل الخدمة لأول مرة؟";
+            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن تحويل الرصيد؟", [
+              { title: "🔄 طريقة التحويل", payload: "HOW_TO_TRANSFER_PAYLOAD" },
+              { title: "💰 تفعيل الخدمة", payload: "ACTIVATE_TRANSFER_PAYLOAD" }
+            ]);
+            continue;
           }
-          else if (userMsg.includes("بريد صوتي") || userMsg.includes("صوتي") || userMsg.includes("voicemail")) {
-            reply = "📞 هل تود تفعيل خدمة البريد الصوتي ✅ أم إلغائها ❌؟";
+          else if (userMsg.includes("خدمة العملاء") || userMsg.includes("contact") || userMsg.includes("اتصال") || userMsg.includes("مشكلة")) {
+            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "كيف يمكنني مساعدتك؟", [
+              { title: "📞 رقم خدمة العملاء", payload: "CUSTOMER_SERVICE_NUMBER_PAYLOAD" },
+              { title: "📡 مشاكل الشبكة", payload: "NETWORK_ISSUE_PAYLOAD" }
+            ]);
+            continue;
           }
-
-          // ✅ القائمة السريعة
           else if (userMsg.includes("القائمة")) {
-            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN);
+            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
+              { title: "💰 الرصيد", payload: "BALANCE_MENU_PAYLOAD" },
+              { title: "🌐 الباقات", payload: "PACKAGES_MENU_PAYLOAD" },
+              { title: "🔄 تحويل الرصيد", payload: "TRANSFER_MENU_PAYLOAD" },
+              { title: "📞 خدمات أخرى", payload: "OTHER_SERVICES_MENU_PAYLOAD" }
+            ]);
             continue; 
           }
           else if (userMsg.includes("شكرا") || userMsg.includes("thanks")) {
@@ -139,15 +148,91 @@ export async function handler(event, context) {
           }
           else if (userMsg.includes("خدمة الزبائن") || userMsg.includes("contact")) {
             reply = "📞 خدمة الزبائن: اتصل بالرقم 666 أو 888.";
+          } else if (userMsg.includes("cridilis")) {
+            reply = "💰 لطلب رصيد بالدين (CridiLIS) بقيمة 20، 50، أو 100 دج: اطلب *662*3*المبلغ#";
           }
+
 
           // ✅ إرسال الرد النصي
           await sendMessage(senderId, reply, PAGE_ACCESS_TOKEN);
-        } else if (webhookEvent.postback && webhookEvent.postback.payload === "GET_STARTED_PAYLOAD") {
-            const welcomeText = "أهلاً بك في روبوت موبليس! 👋 كيف يمكنني مساعدتك اليوم؟";
-            await sendMessage(senderId, welcomeText, PAGE_ACCESS_TOKEN);
-        } else if (webhookEvent.postback && webhookEvent.postback.payload === "QUICK_REPLIES_PAYLOAD") {
-            await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN);
+        } else if (webhookEvent.postback) {
+          const payload = webhookEvent.postback.payload;
+          let replyText = "";
+          
+          switch (payload) {
+            case "CHECK_BALANCE_PAYLOAD":
+              replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: *#222";
+              break;
+            case "RECHARGE_PAYLOAD":
+              replyText = "🔋 لشحن رصيدك (كارت): اطلب *111*رقم الكارت#";
+              break;
+            case "CRIDILIS_PAYLOAD":
+              replyText = "💰 لطلب رصيد بالدين (CridiLIS) بقيمة 20، 50، أو 100 دج: اطلب *662*3*المبلغ#";
+              break;
+            case "INTERNET_PACKAGES_PAYLOAD":
+              replyText = "🌐 لمعرفة باقات الإنترنت، اطلب الكود: *600*";
+              break;
+            case "CALL_PACKAGES_PAYLOAD":
+              replyText = "☎️ لمعرفة باقات المكالمات، اطلب الكود: *600*";
+              break;
+            case "ALL_OFFERS_PAYLOAD":
+              replyText = "📢 لمعرفة كل العروض والباقات، اطلب الكود: #600*";
+              break;
+            case "HOW_TO_TRANSFER_PAYLOAD":
+              replyText = "🔄 لتحويل الرصيد (فليكسي): اطلب #610*رقم الهاتف*المبلغ*الرقم السري#\n\n- ملاحظة: لتفعيل الخدمة أول مرة اطلب #610*";
+              break;
+            case "ACTIVATE_TRANSFER_PAYLOAD":
+              replyText = "💰 لتفعيل خدمة تحويل الرصيد أول مرة، اطلب الكود: *#610";
+              break;
+            case "CUSTOMER_SERVICE_NUMBER_PAYLOAD":
+              replyText = "📞 للتواصل مع خدمة العملاء، اتصل بالرقم 666 أو 888.";
+              break;
+            case "NETWORK_ISSUE_PAYLOAD":
+              replyText = "📡 لمعالجة مشاكل الشبكة، يرجى إعادة تشغيل هاتفك أو تجربة شريحتك في هاتف آخر. إذا استمرت المشكلة، يرجى التواصل مع خدمة العملاء على الرقم 666.";
+              break;
+            case "BALANCE_MENU_PAYLOAD":
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
+                { title: "📊 الرصيد الحالي", payload: "CHECK_BALANCE_PAYLOAD" },
+                { title: "🔋 شحن الرصيد", payload: "RECHARGE_PAYLOAD" },
+                { title: "💰 رصيد بالدين (CridiLIS)", payload: "CRIDILIS_PAYLOAD" }
+              ]);
+              continue;
+            case "PACKAGES_MENU_PAYLOAD":
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الباقات والعروض؟", [
+                { title: "🌐 باقات الإنترنت", payload: "INTERNET_PACKAGES_PAYLOAD" },
+                { title: "☎️ باقات المكالمات", payload: "CALL_PACKAGES_PAYLOAD" },
+                { title: "📢 كل العروض", payload: "ALL_OFFERS_PAYLOAD" }
+              ]);
+              continue;
+            case "TRANSFER_MENU_PAYLOAD":
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن تحويل الرصيد؟", [
+                { title: "🔄 طريقة التحويل", payload: "HOW_TO_TRANSFER_PAYLOAD" },
+                { title: "💰 تفعيل الخدمة", payload: "ACTIVATE_TRANSFER_PAYLOAD" }
+              ]);
+              continue;
+            case "OTHER_SERVICES_MENU_PAYLOAD":
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر من الخدمات الإضافية:", [
+                { title: "📞 المكالمات الفائتة", payload: "MISSED_CALLS_PAYLOAD" },
+                { title: "🚫 مغلق/خارج التغطية", payload: "OUT_OF_SERVICE_PAYLOAD" },
+                { title: "☎️ تحويل المكالمات", payload: "CALL_FORWARDING_PAYLOAD" }
+              ]);
+              continue;
+            case "MISSED_CALLS_PAYLOAD":
+              replyText = "📞 لتفعيل خدمة المكالمات الفائتة، اطلب الكود: #21*644*";
+              break;
+            case "OUT_OF_SERVICE_PAYLOAD":
+              replyText = "🚫 لتفعيل خدمة مغلق أو خارج التغطية، اطلب الكود: #644*21*";
+              break;
+            case "CALL_FORWARDING_PAYLOAD":
+              replyText = "☎️ لتحويل المكالمات إلى رقم آخر، اطلب الكود: *21*الرقم المراد التحويل إليه#";
+              break;
+            default:
+              replyText = "أهلاً بك! كيف يمكنني مساعدتك؟";
+          }
+
+          if (replyText) {
+            await sendMessage(senderId, replyText, PAGE_ACCESS_TOKEN);
+          }
         }
       }
       return { statusCode: 200, body: "EVENT_RECEIVED" };
@@ -171,41 +256,19 @@ async function sendMessage(senderId, text, token) {
 }
 
 // 🔹 إرسال أزرار سريعة (Quick Replies)
-async function sendQuickReplies(senderId, token) {
+async function sendQuickReplies(senderId, token, text, quickReplies) {
   await fetch(`https://graph.facebook.com/v16.0/me/messages?access_token=${token}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       recipient: { id: senderId },
       message: {
-        text: "اختر الخدمة التي تناسبك 👇:",
-        quick_replies: [
-          {
-            content_type: "text",
-            title: "💰 معرفة الرصيد",
-            payload: "CHECK_BALANCE"
-          },
-          {
-            content_type: "text",
-            title: "🔄 تحويل الرصيد",
-            payload: "TRANSFER_BALANCE"
-          },
-          {
-            content_type: "text",
-            title: "🌐 الباقات والعروض",
-            payload: "PACKAGES"
-          },
-          {
-            content_type: "text",
-            title: "☎️ خدمة العملاء",
-            payload: "CUSTOMER_SERVICE"
-          },
-          {
-            content_type: "text",
-            title: "📞 خدمات إضافية",
-            payload: "ADDITIONAL_SERVICES"
-          }
-        ]
+        text: text,
+        quick_replies: quickReplies.map(qr => ({
+          content_type: "text",
+          title: qr.title,
+          payload: qr.payload
+        }))
       }
     }),
   });
