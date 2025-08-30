@@ -41,6 +41,44 @@ export async function handler(event, context) {
           continue;
         }
 
+        // ✅ QUICK REPLIES (الفقاعات)
+        if (webhookEvent.message && webhookEvent.message.quick_reply) {
+          const payload = webhookEvent.message.quick_reply.payload;
+
+          if (payload === "BALANCE") {
+            await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "INTERNET") {
+            await sendOffers(senderId, PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "FLEXI") {
+            await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "CUSTOMER") {
+            await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "RONVOI") {
+            await sendMessage(senderId, "☎️ لتحويل المكالمات: *21*الرقم# ❌ إلغاء: #21#", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "OFFLINE") {
+            await sendMessage(senderId, "🚫 خدمة مغلق: #644*21* ❌ إلغاء: #002* أو #21#", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "MISSED") {
+            await sendMessage(senderId, "📞 المكالمات الفائتة: #21*644*", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "EXTRA") {
+            await sendMessage(senderId, "🎵 خدمات إضافية: إلغاء رنتي #680*، إلغاء Mob Sound: SMS بكلمة DES إلى 4121", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "CREDILIS") {
+            await sendMessage(senderId, "💡 CridiLIS: اطلب *662*3*المبلغ# (20، 50 أو 100 دج).", PAGE_ACCESS_TOKEN);
+          }
+          else if (payload === "REGISTER") {
+            await sendMessage(senderId, "📝 للتسجيل: SMS يحتوي على بريدك الإلكتروني إلى 666.", PAGE_ACCESS_TOKEN);
+          }
+
+          continue;
+        }
+
         // ✅ الرسائل النصية
         if (webhookEvent.message && webhookEvent.message.text) {
           const userMsg = webhookEvent.message.text.trim().toLowerCase();
@@ -151,26 +189,22 @@ async function sendMessage(senderId, text, token) {
   console.log("📤 رد فيسبوك:", data);
 }
 
-// 🔹 زر البداية (3 أزرار فقط)
+// 🔹 قائمة البداية (Quick Replies)
 async function sendWelcomeButtons(senderId, token) {
   await fetch(`https://graph.facebook.com/v16.0/me/messages?access_token=${token}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       recipient: { id: senderId },
+      messaging_type: "RESPONSE",
       message: {
-        attachment: {
-          type: "template",
-          payload: {
-            template_type: "button",
-            text: "اختر الخدمة التي تناسبك 👇",
-            buttons: [
-              { type: "postback", title: "📱 الرصيد", payload: "BALANCE" },
-              { type: "postback", title: "🌐 العروض", payload: "INTERNET" },
-              { type: "postback", title: "🔄 فليكسي", payload: "FLEXI" }
-            ]
-          }
-        }
+        text: "👇 اختر الخدمة التي تناسبك:",
+        quick_replies: [
+          { content_type: "text", title: "📱 الرصيد", payload: "BALANCE" },
+          { content_type: "text", title: "🌐 العروض", payload: "INTERNET" },
+          { content_type: "text", title: "🔄 فليكسي", payload: "FLEXI" },
+          { content_type: "text", title: "☎️ خدمة العملاء", payload: "CUSTOMER" }
+        ]
       }
     }),
   });
