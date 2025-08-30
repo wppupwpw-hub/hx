@@ -140,14 +140,6 @@ export async function handler(event, context) {
               default:
                 replyText = "أهلاً بك! كيف يمكنني مساعدتك؟";
             }
-          } else if (webhookEvent.postback && (webhookEvent.postback.payload === "GET_STARTED_PAYLOAD" || webhookEvent.postback.payload === "MAIN_MENU_PAYLOAD")) {
-              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
-                { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
-                { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
-                { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
-                { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
-              ]);
-              continue;
           } else {
             // ✅ الردود الاجتماعية والإنسانية
             if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
@@ -174,7 +166,15 @@ export async function handler(event, context) {
               replyText = "أنا روبوت موبيليس، مهمتي هي مساعدتك في كل ما يخص خدمات الشركة. 😊";
             }
             // ✅ الردود الخاصة بالخدمات
-            else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
+            else if (userMsg.includes("القائمة") || userMsg.includes("خدمات")) {
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
+                { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
+                { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
+                { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
+                { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
+              ]);
+              continue;
+            } else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
               replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: #222*";
             } else if (userMsg.includes("شحن الرصيد") || userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
               replyText = "🔋 لشحن رصيدك باستعمال الكارت: اطلب الكود #رقم الكارت*111*";
