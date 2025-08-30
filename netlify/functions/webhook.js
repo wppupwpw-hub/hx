@@ -24,28 +24,32 @@ export async function handler(event, context) {
 
         // ✅ POSTBACK (الأزرار)
         if (webhookEvent.postback && webhookEvent.postback.payload) {
-          const payload = webhookEvent.postback.payload;
+  const payload = webhookEvent.postback.payload;
 
-          if (payload === "BALANCE") {
-            await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
-          }
-          else if (payload === "INTERNET") {
-            await sendOffers(senderId, PAGE_ACCESS_TOKEN); // عروض Twenty
-          }
-          else if (payload === "FLEXI") {
-            await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
-          }
-          else if (payload === "CUSTOMER") {
-            await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
-          }
-          else if (payload === "SHOW_MENU") {
-            await sendWelcomeButtons(senderId, PAGE_ACCESS_TOKEN);
-          }
-          else if (payload === "SHOW_EXTRA") {
-            await sendExtraServices(senderId, PAGE_ACCESS_TOKEN);
-          }
-          continue;
-        }
+  if (payload === "BALANCE") {
+    await sendMessage(senderId, "📊 لمعرفة رصيدك: #222*", PAGE_ACCESS_TOKEN);
+  }
+  else if (payload === "INTERNET") {
+    await sendOffers(senderId, PAGE_ACCESS_TOKEN);
+  }
+  else if (payload === "FLEXI") {
+    await sendMessage(senderId, "🔄 تحويل رصيد: #610*", PAGE_ACCESS_TOKEN);
+  }
+  else if (payload === "CUSTOMER") {
+    await sendMessage(senderId, "☎️ خدمة العملاء: اتصل بـ 888.", PAGE_ACCESS_TOKEN);
+  }
+  else if (payload === "SHOW_MENU") {
+    await sendWelcomeButtons(senderId, PAGE_ACCESS_TOKEN);
+  }
+  else if (payload === "SHOW_EXTRA") {
+    await sendExtraServices(senderId, PAGE_ACCESS_TOKEN);
+  }
+
+  // ✅ نوقف هنا وما نكملش للـ message.text
+  continue; 
+}
+
+        
 
         // ✅ الرسائل النصية
         if (webhookEvent.message && webhookEvent.message.text) {
