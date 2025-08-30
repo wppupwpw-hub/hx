@@ -142,7 +142,7 @@ export async function handler(event, context) {
             }
           } else {
             // ✅ الردود الاجتماعية والإنسانية
-            if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
+            if (userMsg.includes("كيف حالك") || userMsg.includes("واش راك") || userMsg.includes("كيراك")) {
               replyText = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
             } else if (userMsg.includes("صباح الخير")) {
               replyText = "☀️ صباح النور! أتمنى لك يوماً جميلاً ومباركاً.";
@@ -150,7 +150,7 @@ export async function handler(event, context) {
               replyText = "🌆 مساء الورد والياسمين.";
             } else if (userMsg.includes("تصبح على خير")) {
               replyText = "🌙 تصبح على خير وأحلام سعيدة.";
-            } else if (userMsg.includes("تمام") || userMsg.includes("بخير") || userMsg.includes("الحمد لله")) {
+            } else if (userMsg.includes("تمام") || userMsg.includes("بخير") || userMsg.includes("الحمد لله") || userMsg.includes("غاية") || userMsg.includes("حمدلله") || userMsg.includes("صفا")) {
               replyText = "🙌 رائع! يسعدني سماع ذلك.";
             } else if (userMsg.includes("شكراً") || userMsg.includes("عفواً") || userMsg.includes("thanks")) {
               replyText = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
@@ -191,7 +191,7 @@ export async function handler(event, context) {
             } else if (userMsg.includes("خدمة الزبائن")) {
               replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
             } else {
-              replyText = "أهلاً بك في خدمة عملاء موبيليس 👋، كيف يمكنني مساعدتك؟";
+              replyText = "أهلاً بك في خدمة عملاء موبيليس 👋،هل تريد اظهار القائمة؟";
             }
           }
 
