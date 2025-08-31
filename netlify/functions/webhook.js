@@ -95,7 +95,7 @@ export async function handler(event, context) {
                 replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
                 break;
               case "MOBILIS_REGISTER":
-                replyText = "📝 للتسجيل في موبيليس والحصول على 2Go أو أكثر: أرسل رسالة SMS ببريدك الإلكتروني إلى الرقم 666. ستحصل على الباقة بعد 48 ساعة. يمكنك أيضاً زيارة الرابط: https://www.mobilis.dz/register";
+                replyText = "📝 للتسجيل في موبيليس والحصول على 2Go أو أكثر: أرسل رسالة SMS مكتوب فيها بريدك الإلكتروني إلى الرقم 666. ستحصل على الباقة بعد 48 ساعة. يمكنك أيضاً زيارة الرابط: https://www.mobilis.dz/register";
                 break;
               case "BALANCE_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
@@ -120,6 +120,7 @@ export async function handler(event, context) {
               case "PACKAGES_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر ما يناسبك:", [
                   { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" },
+                  { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" }
                 ]);
                 continue;
               case "ADDITIONAL_SERVICES_MENU":
@@ -139,9 +140,17 @@ export async function handler(event, context) {
               default:
                 replyText = "أهلاً بك! كيف يمكنني مساعدتك؟";
             }
+          } else if (webhookEvent.postback && webhookEvent.postback.payload === "GET_STARTED_PAYLOAD") {
+              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
+                { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
+                { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
+                { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
+                { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
+              ]);
+              continue;
           } else {
             // ✅ الردود الاجتماعية والإنسانية
-            if (userMsg.includes("كيف حالك") || userMsg.includes("واش راك") || userMsg.includes("كيراك")) {
+            if (userMsg.includes("كيفك") || userMsg.includes("واش راك") || userMsg.includes("عامل ايه")) {
               replyText = "😊 الحمد لله بخير، شكراً لسؤالك. وانت كيف حالك؟";
             } else if (userMsg.includes("صباح الخير")) {
               replyText = "☀️ صباح النور! أتمنى لك يوماً جميلاً ومباركاً.";
@@ -149,7 +158,7 @@ export async function handler(event, context) {
               replyText = "🌆 مساء الورد والياسمين.";
             } else if (userMsg.includes("تصبح على خير")) {
               replyText = "🌙 تصبح على خير وأحلام سعيدة.";
-            } else if (userMsg.includes("تمام") || userMsg.includes("بخير") || userMsg.includes("الحمد لله") || userMsg.includes("غاية") || userMsg.includes("حمدلله") || userMsg.includes("صفا")) {
+            } else if (userMsg.includes("تمام") || userMsg.includes("بخير") || userMsg.includes("الحمد لله")) {
               replyText = "🙌 رائع! يسعدني سماع ذلك.";
             } else if (userMsg.includes("شكراً") || userMsg.includes("عفواً") || userMsg.includes("thanks")) {
               replyText = "🌹 على الرحب والسعة، نحن دائماً في خدمتك.";
@@ -165,15 +174,14 @@ export async function handler(event, context) {
               replyText = "أنا روبوت موبيليس، مهمتي هي مساعدتك في كل ما يخص خدمات الشركة. 😊";
             }
             // ✅ الردود الخاصة بالخدمات
-            else if (userMsg.includes("القائمة") || userMsg.includes("خدمات")) {
-              await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
-                { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
-                { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
-                { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
-                { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" },
-                { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
-              ]);
-              continue;
+            else if (userMsg.includes("القائمة") || userMsg.includes("قائمة") || userMsg.includes("نعم") || userMsg.includes("واه")) {
+                await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر الخدمة التي تناسبك 👇:", [
+                    { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
+                    { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
+                    { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
+                    { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
+                ]);
+                continue;
             } else if (userMsg.includes("معرفة الرصيد") || userMsg.includes("رصيد") || userMsg.includes("solde")) {
               replyText = "📊 لمعرفة رصيدك الحالي، اطلب الكود: #222*";
             } else if (userMsg.includes("شحن الرصيد") || userMsg.includes("تعبئة") || userMsg.includes("recharge")) {
@@ -191,7 +199,7 @@ export async function handler(event, context) {
             } else if (userMsg.includes("خدمة الزبائن")) {
               replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
             } else {
-              replyText = "أهلاً بك في خدمة عملاء موبيليس 👋،هل تريد اظهار القائمة؟";
+              replyText = "أهلاً بك في خدمة عملاء موبيليس 👋، كيف يمكنني مساعدتك؟";
             }
           }
 
