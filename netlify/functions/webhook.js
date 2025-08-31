@@ -95,7 +95,7 @@ export async function handler(event, context) {
                 replyText = "📞 للتواصل مع خدمة الزبائن، اتصل على الرقم 666 أو 888.";
                 break;
               case "MOBILIS_REGISTER":
-                replyText = "📝 للتسجيل في موبيليس والحصول على 2Go أو أكثر: أرسل رسالة SMS مكتوب فيها بريدك الإلكتروني إلى الرقم 666. ستحصل على الباقة بعد 48 ساعة. يمكنك أيضاً زيارة الرابط: https://www.mobilis.dz/register";
+                replyText = "📝 للتسجيل في موبيليس والحصول على 2Go أو أكثر: أرسل رسالة SMS ببريدك الإلكتروني إلى الرقم 666. ستحصل على الباقة بعد 48 ساعة. يمكنك أيضاً زيارة الرابط: https://www.mobilis.dz/register";
                 break;
               case "BALANCE_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "ماذا تود أن تعرف عن الرصيد؟", [
@@ -119,7 +119,7 @@ export async function handler(event, context) {
                 continue;
               case "PACKAGES_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر ما يناسبك:", [
-                  { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" },
+                  { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" }
                 ]);
                 continue;
               case "ADDITIONAL_SERVICES_MENU":
@@ -144,7 +144,7 @@ export async function handler(event, context) {
                 { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
                 { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
                 { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
-                { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" },
+                { title: "📝 تسجيل موبليس", payload: "MOBILIS_REGISTER" },
                 { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
               ]);
               continue;
@@ -179,6 +179,7 @@ export async function handler(event, context) {
                     { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
                     { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
                     { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
+                    { title: "📝 تسجيل موبليس", payload: "MOBILIS_REGISTER" },
                     { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
                 ]);
                 continue;
