@@ -120,7 +120,6 @@ export async function handler(event, context) {
               case "PACKAGES_MENU":
                 await sendQuickReplies(senderId, PAGE_ACCESS_TOKEN, "اختر ما يناسبك:", [
                   { title: "🌐 العروض والباقات", payload: "PACKAGES_AND_OFFERS" },
-                  { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" }
                 ]);
                 continue;
               case "ADDITIONAL_SERVICES_MENU":
@@ -145,6 +144,7 @@ export async function handler(event, context) {
                 { title: "💰 الرصيد ومعرفة الرقم", payload: "BALANCE_MENU" },
                 { title: "🔄 تحويل الرصيد (فليكسي)", payload: "TRANSFER_MENU" },
                 { title: "🌐 العروض والباقات", payload: "PACKAGES_MENU" },
+                { title: "📝 تسجيل موبيليس", payload: "MOBILIS_REGISTER" },
                 { title: "📞 خدمات إضافية", payload: "ADDITIONAL_SERVICES_MENU" }
               ]);
               continue;
